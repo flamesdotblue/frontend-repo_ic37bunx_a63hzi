@@ -1,12 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "./components/Header.jsx";
 import ChildDeviceCard from "./components/ChildDeviceCard.jsx";
 import ActivityOverview from "./components/ActivityOverview.jsx";
 import RuleBuilder from "./components/RuleBuilder.jsx";
+import MobileLogin from "./components/MobileLogin.jsx";
 import { Shield } from "lucide-react";
 
 function App() {
   const [showSettings, setShowSettings] = useState(false);
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("auth_token");
+    setAuthed(!!token);
+  }, []);
+
+  if (!authed) {
+    return <MobileLogin onSuccess={() => setAuthed(true)} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50 text-slate-900">
@@ -38,7 +49,17 @@ function App() {
               <li>• Send weekly reports via email</li>
               <li>• Apply rules across all devices</li>
             </ul>
-            <div className="mt-5 text-right">
+            <div className="mt-5 flex items-center justify-between">
+              <button
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50"
+                onClick={() => {
+                  localStorage.removeItem("auth_token");
+                  localStorage.removeItem("auth_user");
+                  setAuthed(false);
+                }}
+              >
+                Sign out
+              </button>
               <button className="rounded-lg bg-indigo-600 text-white px-4 py-2 text-sm hover:bg-indigo-700" onClick={() => setShowSettings(false)}>
                 Done
               </button>
